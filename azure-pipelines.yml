@@ -1,9 +1,3 @@
-# Maven
-
-# Build your Java project and run tests with Apache Maven.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/java
-
 trigger:
 - main
 
@@ -14,3 +8,7 @@ steps:
 - task: Bash@3
   inputs:
     filePath: 'start_simulation.sh'
+    arguments: >
+      $(gatlingEnterpriseUrl)
+      $(apiToken)
+      $(simulationId)
