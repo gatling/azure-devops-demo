@@ -1,12 +1,13 @@
 trigger: none
 
-pool: AzurePipelinesPool
+pool: AzurePipelinesPool # Name of the agent pool configured in Azure DevOps
 
 steps:
 - task: Bash@3
   displayName: Install JQ
   inputs:
     targetType: 'inline'
+    # Curl and JQ are required by the CI script
     script: 'sudo apt-get update && sudo apt-get -y install jq'
 - task: Bash@3
   displayName: Start simulation
