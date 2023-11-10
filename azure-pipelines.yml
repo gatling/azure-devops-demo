@@ -8,6 +8,7 @@ steps:
   inputs:
     targetType: 'inline'
     # Curl and JQ are required by the CI script
+    # In this example, we use Ubuntu agents which come with curl but not jq
     script: 'sudo apt-get update && sudo apt-get -y install jq'
 - task: Bash@3
   displayName: Start simulation
