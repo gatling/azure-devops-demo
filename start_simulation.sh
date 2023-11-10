@@ -109,11 +109,11 @@ while isRunning "${runStatus}"; do
 
     echo ""
     date
-    echo "Number of active users:" \
-         "$(echo "${activeUsersMetrics}" | jq -r '.[].values[-1]' )"
-    echo "Number of requests: $(echo "${runMetrics}" | jq -r '.out.counts.total' )"
-    echo "Number of requests per seconds: $(echo "${runMetrics}" | jq -r '.out.rps.total' )"
-    echo "Failure ratio: $(echo "${runMetrics}" | jq -r '.in.counts.koPercent' )"
+    echo "Number of concurrent users:" \
+         "$(echo "${activeUsersMetrics}" | jq -r '[.[].values[-1]] | add')"
+    echo "Number of requests: $(echo "${runMetrics}" | jq -r '.out.counts.total')"
+    echo "Number of requests per second: $(echo "${runMetrics}" | jq -r '.out.rps.total')"
+    echo "Failure ratio: $(echo "${runMetrics}" | jq -r '.in.counts.koPercent')"
   fi
 done
 
