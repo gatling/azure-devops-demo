@@ -5,10 +5,12 @@ pool: AzurePipelinesPool
 
 steps:
 - task: Bash@3
+  displayName: Install JQ
   inputs:
     targetType: 'inline'
     script: 'sudo apt-get update && sudo apt-get -y install jq'
 - task: Bash@3
+  displayName: Start simulation
   inputs:
     filePath: 'start_simulation.sh'
     arguments: >
