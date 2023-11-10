@@ -1,18 +1,8 @@
-Gatling plugin for Maven - Java demo project
-============================================
+# Gatling Azure DevOps Pipelines demo
 
-A simple showcase of a Maven project using the Gatling plugin for Maven. Refer to the plugin documentation
-[on the Gatling website](https://gatling.io/docs/current/extensions/maven_plugin/) for usage.
+A simple showcase of using Azure DevOps Pipelines with Gatling Enterprise.
+It is based on the [Gatling with Maven and Java demo project](https://github.com/gatling/gatling-maven-plugin-demo-java).
 
-This project is written in Java, others are available for [Kotlin](https://github.com/gatling/gatling-maven-plugin-demo-kotlin)
-and [Scala](https://github.com/gatling/gatling-maven-plugin-demo-scala).
+> [!NOTE]
+> Refer to the documentation [on the Gatling website](https://gatling.io/docs/enterprise/cloud/reference/plugins/azure_devops/) for usage.
 
-It includes:
-
-* [Maven Wrapper](https://maven.apache.org/wrapper/), so that you can immediately run Maven with `./mvnw` without having
-  to install it on your computer
-* minimal `pom.xml`
-* latest version of `io.gatling:gatling-maven-plugin` applied
-* sample [Simulation](https://gatling.io/docs/gatling/reference/current/general/concepts/#simulation) class,
-  demonstrating sufficient Gatling functionality
-* proper source file layout
