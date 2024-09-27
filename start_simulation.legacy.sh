@@ -2,9 +2,6 @@
 
 # Start a Gatling Enterprise simulation & display its results.
 
-# This script is meant to be used with the Cloud version of Gatling Enterprise only.
-# For a Self-Hosted compatible version, check the start_simulation.legacy.sh file.
-
 # This script has the same purpose as the Jenkins, Bamboo or Teamcity plugin. It enables you to launch a Gatling
 # Enterprise simulation and display live metrics.
 
@@ -18,7 +15,7 @@ checkParameter() {
 
   if [ -z $2 ]; then
     echo "Missing parameter" $1
-    echo "Syntax: ./start_simulation.sh simulationId"
+    echo "Syntax: ./start_simulation.legacy.sh gatlingEnterpriseUrl apiToken simulationId"
     exit 1
   else
     eval $__varname=$2
@@ -26,7 +23,7 @@ checkParameter() {
 }
 
 execRequest() {
-  result=$(curl -s -X $2 --header "Authorization:$GATLING_ENTERPRISE_API_TOKEN" $1)
+  result=$(curl -s -X $3 --header "Authorization:$2" $1)
   if [ $? -ne 0 ]; then
     echo "Gatling Enterprise url is not configured correctly, please check that the url is correct" >&2
     exit 1
@@ -75,43 +72,40 @@ statuses=(
 )
 
 # Check params
-command -v jq >/dev/null 2>&1 || { echo >&2 "Please install jq to use this script: https://stedolan.github.io/jq/download/. Aborting."; exit 1; }
+command -v jq >/dev/null 2>&1 || { echo >&2 "Please install jq to use this script: https://stedolan.github.io/jq/download/.  Aborting."; exit 1; }
+checkParameter gatlingEnterpriseUrl $1
+checkParameter apiToken $2
+checkParameter simulationId $3
 
-if [ -z "$GATLING_ENTERPRISE_API_TOKEN" ]; then
-  echo "An API token is required to call the Gatling Enterprise server; see https://docs.gatling.io/reference/execute/cloud/admin/api-tokens/ and create a token with the role 'Configurer'."
-  echo "You can then set your API token's value in the environment variable GATLING_ENTERPRISE_API_TOKEN."
+if [[ $gatlingEnterpriseUrl == */ ]]; then
+  echo "Gatling Enterprise URL can't end with a /, please remove it"
   exit 1
 fi
 
-checkParameter simulationId $1
-
-apiUrl=https://api.gatling.io
-webAppUrl=https://cloud.gatling.io
-
 # Start simulation
-run=$(execRequest "${apiUrl}/api/public/simulations/start?simulation=${simulationId}" POST)
+run=$(execRequest "${gatlingEnterpriseUrl}/api/public/simulations/start?simulation=${simulationId}" "${apiToken}" POST)
 runId=$(echo "${run}" | jq -r '.runId')
 reportsPath=$(echo "${run}" | jq -r '.reportsPath // empty')
-reportsUrl=$(echo "${webAppUrl}${reportsPath}")
+reportsUrl=$([ -z "$reportsPath" ] && echo "${gatlingEnterpriseUrl}/#/simulations/reports/${runId}" || echo "${gatlingEnterpriseUrl}${reportsPath}")
 
 echo "Simulation started with runId ${runId}"
 echo "The corresponding reports will be available here: ${reportsUrl}"
 
-runInformation=$(execRequest "${apiUrl}/api/public/run?run=${runId}" GET)
+runInformation=$(execRequest "${gatlingEnterpriseUrl}/api/public/run?run=${runId}" "${apiToken}" GET)
 runStatus=$(echo "${runInformation}" | jq -r '.status')
 
 # Check every 5 seconds the run status
 while isRunning "${runStatus}"; do
   sleep 5
 
-  runInformation=$(execRequest "${apiUrl}/api/public/run?run=${runId}" GET)
+  runInformation=$(execRequest "${gatlingEnterpriseUrl}/api/public/run?run=${runId}" "${apiToken}" GET)
   runStatus=$(echo "${runInformation}" | jq -r '.status')
 
   if isInjecting "${runStatus}"; then
 
-    runMetrics=$(execRequest "${apiUrl}/api/public/summaries/requests?run=${runId}" GET)
-    urlUserMetric="${apiUrl}/api/public/series?run=${runId}&metric=usrActive"
-    activeUsersMetrics=$(curl -s -X GET --header "Authorization:${GATLING_ENTERPRISE_API_TOKEN}" "${urlUserMetric}")
+    runMetrics=$(execRequest "${gatlingEnterpriseUrl}/api/public/summaries/requests?run=${runId}" "${apiToken}" GET)
+    urlUserMetric="${gatlingEnterpriseUrl}/api/public/series?run=${runId}&metric=usrActive"
+    activeUsersMetrics=$(curl -s -X GET --header "Authorization:${apiToken}" "${urlUserMetric}")
 
     echo ""
     date
