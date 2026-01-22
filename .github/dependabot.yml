@@ -8,5 +8,4 @@ updates:
   - package-ecosystem: "maven" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
-      day: "monday" # explicit, even tough it's the weekly default
-      time: "07:00" # UTC
+      interval: "weekly"
